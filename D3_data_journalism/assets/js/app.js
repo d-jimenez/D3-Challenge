@@ -111,7 +111,7 @@ function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
   var ylabel;
 
   if (chosenYAxis === "healthcare") {
-    ylabel = "Lacks Healthcare (%)";
+    ylabel = "Lack of Healthcare (%)";
   }
   else if (chosenYAxis==="smokes") {
     ylabel = "Smokes (%)";
@@ -216,11 +216,20 @@ d3.csv("assets/data/data.csv").then(function(dataDemo, err) {
       .data(dataDemo)
       .enter()
       .append("circle")
-      .attr("cx", d => xLinearScale(d[chosenXAxis]))
-      .attr("cy", d => yLinearScale(d[chosenYAxis]))
+      .attr("cx", d => xLinearScale(+d[chosenXAxis]))
+      .attr("cy", d => yLinearScale(+d[chosenYAxis]))
       .attr("r", 15)
       .attr("fill", "#23acd6")
       .attr("opacity", ".5");
+
+    // append initial State Abbreviations
+    var textGroup = chartGroup.selectAll("text")
+        .data(dataDemo)
+        .enter()
+        .append("text")
+        .text(d=>d.abbr)
+        .attr("x", d => xLinearScale(+d[chosenXAxis]))
+        .attr("y", d => yLinearScale(+d[chosenYAxis]))
   
     // Create group for three x-axis labels
     var xlabelsGroup = chartGroup.append("g")
@@ -258,7 +267,7 @@ d3.csv("assets/data/data.csv").then(function(dataDemo, err) {
         .attr("y", -70)
         .attr("value", "healthcare") // value to grab for event listener
         .classed("active", true)
-        .text("Lacks Healthcare (%)");
+        .text("Lack of Healthcare (%)");
   
     var smokesLabel = ylabelsGroup.append("text")
         .attr("transform", "rotate(-90)")
