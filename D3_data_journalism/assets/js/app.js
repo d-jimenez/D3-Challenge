@@ -1,78 +1,106 @@
 // @TODO: YOUR CODE HERE!
 
-// // svg container
-// var svgHeight = 500;
-// var svgWidth = 1000;
+// svg container
+var svgHeight = 400;
+var svgWidth = 1000;
 
-// // margins
-// var margin = {
-//   top: 50,
-//   right: 50,
-//   bottom: 50,
-//   left: 50
-// };
+// margins
+var margin = {
+  top: 50,
+  right: 50,
+  bottom: 50,
+  left: 50
+};
 
-// // chart area minus margins
-// var chartHeight = svgHeight - margin.top - margin.bottom;
-// var chartWidth = svgWidth - margin.left - margin.right;
+// chart area minus margins
+var chartHeight = svgHeight - margin.top - margin.bottom;
+var chartWidth = svgWidth - margin.left - margin.right;
 
-// // Create an SVG wrapper, append an SVG group that will hold our chart,
-// // and shift the latter by left and top margins.
-// var svg = d3
-//     .select("#scatter")
-//     .append("svg")
-//     .attr("height", svgHeight)
-//     .attr("width", svgWidth);
+// Create an SVG wrapper, append an SVG group that will hold our chart,
+// and shift the latter by left and top margins.
+var svg = d3
+    .select("#scatter")
+    .append("svg")
+    .attr("height", svgHeight)
+    .attr("width", svgWidth);
 
-// // Append an SVG group
-// // shift everything over by the margins
-// var chartGroup = svg.append("g")
-//   .attr("transform", `translate(${margin.left}, ${margin.top})`);
+// Append an SVG group
+// shift everything over by the margins
+var chartGroup = svg.append("g")
+  .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-// // scale y to chart height
-// var yScale = d3.scaleLinear()
-//   .domain([0, d3.max(dataArray)])
-//   .range([chartHeight, 0]);
+// Initial Params
+var chosenXAxis = "poverty";
 
-// // scale x to chart width
-// var xScale = d3.scaleBand()
-//   .domain(dataCategories)
-//   .range([0, chartWidth])
-//   .padding(0.05);
+// function used for updating x-scale var upon click on axis label
+function xScale(dataDemo, chosenXAxis) {
+  // create scales
+  var xLinearScale = d3.scaleLinear()
+    .domain([d3.min(dataDemo, d => +d[chosenXAxis]),
+      d3.max(dataDemo, d => +d[chosenXAxis])
+    ])
+    .range([0, chartWidth]);
 
-// // create axes
-// var yAxis = d3.axisLeft(yScale);
-// var xAxis = d3.axisBottom(xScale);
+  return xLinearScale;
 
-// // set x to the bottom of the chart
-// chartGroup.append("g")
-//   .attr("transform", `translate(0, ${chartHeight})`)
-//   .call(xAxis);
+}
 
-// // set y to the y axis
-// // This syntax allows us to call the axis function
-// // and pass in the selector without breaking the chaining
-// chartGroup.append("g")
-//   .call(yAxis);
+// function used for updating xAxis var upon click on axis label
+function renderAxes(newXScale, xAxis) {
+  var bottomAxis = d3.axisBottom(newXScale);
 
+  xAxis.transition()
+    .duration(1000)
+    .call(bottomAxis);
 
+  return xAxis;
+}
 
-// // Create circles 
-// var circles = svg.selectAll("circle");
+// function used for updating circles group with a transition to
+// new circles
+function renderCircles(circlesGroup, newXScale, chosenXAxis) {
 
-// var rValues = [40, 25, 10];
+  circlesGroup.transition()
+    .duration(1000)
+    .attr("cx", d => newXScale(d[chosenXAxis]));
 
-// circles.data(rValues)
-//     .enter()
-//     .append("circle")
-//     .attr("cx", 50)
-//     .attr("cy", 50)
-//     .attr("r", function(d) {
-//       return d;
-//     })
-//     .attr("stroke", "black")
-//     .attr("stroke-width", "5")
-//     .attr("fill", "red");
+  return circlesGroup;
+}
+
+// function used for updating circles group with new tooltip
+function updateToolTip(chosenXAxis, circlesGroup) {
+
+  var label;
+
+  if (chosenXAxis === "poverty") {
+    label = "In Poverty (%)";
+  }
+  else if (chosenXAxis==="age") {
+    label = "Age (Median)";
+  } 
+  else {
+      label="Household Income (Median)"
+  }
+
+  var toolTip = d3.tip()
+    .attr("class", "tooltip")
+    .offset([80, -60])
+    .html(function(d) {
+      return (`${d.state}<br>${label} ${d[chosenXAxis]}`);
+    });
+
+  circlesGroup.call(toolTip);
+
+  circlesGroup.on("mouseover", function(data) {
+    toolTip.show(data);
+  })
+    // onmouseout event
+    .on("mouseout", function(data, index) {
+      toolTip.hide(data);
+    });
+
+  return circlesGroup;
+};
 
 // Retrieve data from the CSV file and execute everything below
 d3.csv("assets/data/data.csv").then(function(dataDemo, err) {
@@ -108,58 +136,58 @@ d3.csv("assets/data/data.csv").then(function(dataDemo, err) {
     // console.log(smokes)
 
     // parse data using .map(), cannot use {} around data.zzz for .map()
-    var states=dataDemo.map(data=>data.state);
-    var poverty=dataDemo.map(data=>+data.poverty);
-    var age=dataDemo.map(data=>+data.age);
-    var income=dataDemo.map(data=>+data.income);
-    var healthcare=dataDemo.map(data=>+data.healthcare);
-    var obesity=dataDemo.map(data=>+data.obesity);
-    var smokes=dataDemo.map(data=>+data.smokes);
-    console.log("states",states);
-    console.log("poverty",poverty)
-    console.log("age",age)
-    console.log("income",income)
-    console.log("healthcare",healthcare)
-    console.log("obesity",obesity)
-    console.log("smokes",smokes)
+    var states_arr=dataDemo.map(data=>data.state);
+    var poverty_arr=dataDemo.map(data=>+data.poverty);
+    var age_arr=dataDemo.map(data=>+data.age);
+    var income_arr=dataDemo.map(data=>+data.income);
+    var healthcare_arr=dataDemo.map(data=>+data.healthcare);
+    var obesity_arr=dataDemo.map(data=>+data.obesity);
+    var smokes_arr=dataDemo.map(data=>+data.smokes);
+    console.log("states",states_arr);
+    console.log("poverty",poverty_arr)
+    console.log("age",age_arr)
+    console.log("income",income_arr)
+    console.log("healthcare",healthcare_arr)
+    console.log("obesity",obesity_arr)
+    console.log("smokes",smokes_arr)
 
   
-    // // xLinearScale function above csv import
-    // var xLinearScale = xScale(hairData, chosenXAxis);
+    // xLinearScale function above csv import
+    var xLinearScale = xScale(dataDemo, chosenXAxis);
   
-    // // Create y scale function
-    // var yLinearScale = d3.scaleLinear()
-    //   .domain([0, d3.max(hairData, d => d.num_hits)])
-    //   .range([height, 0]);
+    // Create y scale function
+    var yLinearScale = d3.scaleLinear()
+      .domain([0, d3.max(dataDemo, d => +d.healthcare)])
+      .range([chartHeight, 0]);
   
-    // // Create initial axis functions
-    // var bottomAxis = d3.axisBottom(xLinearScale);
-    // var leftAxis = d3.axisLeft(yLinearScale);
+    // Create initial axis functions
+    var bottomAxis = d3.axisBottom(xLinearScale);
+    var leftAxis = d3.axisLeft(yLinearScale);
   
-    // // append x axis
-    // var xAxis = chartGroup.append("g")
-    //   .classed("x-axis", true)
-    //   .attr("transform", `translate(0, ${height})`)
-    //   .call(bottomAxis);
+    // append x axis
+    var xAxis = chartGroup.append("g")
+      .classed("x-axis", true)
+      .attr("transform", `translate(0, ${chartHeight})`)
+      .call(bottomAxis);
   
-    // // append y axis
-    // chartGroup.append("g")
-    //   .call(leftAxis);
+    // append y axis
+    chartGroup.append("g")
+      .call(leftAxis);
   
-    // // append initial circles
-    // var circlesGroup = chartGroup.selectAll("circle")
-    //   .data(hairData)
-    //   .enter()
-    //   .append("circle")
-    //   .attr("cx", d => xLinearScale(d[chosenXAxis]))
-    //   .attr("cy", d => yLinearScale(d.num_hits))
-    //   .attr("r", 20)
-    //   .attr("fill", "pink")
-    //   .attr("opacity", ".5");
+    // append initial circles
+    var circlesGroup = chartGroup.selectAll("circle")
+      .data(dataDemo)
+      .enter()
+      .append("circle")
+      .attr("cx", d => xLinearScale(d[chosenXAxis]))
+      .attr("cy", d => yLinearScale(d.healthcare))
+      .attr("r", 20)
+      .attr("fill", "pink")
+      .attr("opacity", ".5");
   
     // // Create group for two x-axis labels
     // var labelsGroup = chartGroup.append("g")
-    //   .attr("transform", `translate(${width / 2}, ${height + 20})`);
+    //   .attr("transform", `translate(${chartWidth / 2}, ${chartHeight + 20})`);
   
     // var hairLengthLabel = labelsGroup.append("text")
     //   .attr("x", 0)
@@ -231,6 +259,7 @@ d3.csv("assets/data/data.csv").then(function(dataDemo, err) {
     //       }
     //     }
     //   });
-  }).catch(function(error) {
+}).catch(function(error) {
     console.log(error);
-  });
+});
+
