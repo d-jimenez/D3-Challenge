@@ -188,18 +188,12 @@ d3.csv("assets/data/data.csv").then(function(dataDemo, err) {
     console.log("healthcare",healthcare_arr)
     console.log("obesity",obesity_arr)
     console.log("smokes",smokes_arr)
-
   
     // xLinearScale function above csv import
     var xLinearScale = xScale(dataDemo, chosenXAxis);
 
     // yLinearScale function above csv import
     var yLinearScale = yScale(dataDemo, chosenYAxis);
-  
-    // // Create y scale function
-    // var yLinearScale = d3.scaleLinear()
-    //   .domain([0, d3.max(dataDemo, d => +d.healthcare)])
-    //   .range([chartHeight, 0]);
   
     // Create initial axis functions
     var bottomAxis = d3.axisBottom(xLinearScale);
@@ -355,16 +349,16 @@ d3.csv("assets/data/data.csv").then(function(dataDemo, err) {
         var value = d3.select(this).attr("value");
         if (value !== chosenYAxis) {
   
-          // replaces chosenXAxis with value
+          // replaces chosenYAxis with value
           chosenYAxis = value;
   
           // console.log(chosenXAxis)
   
           // functions here found above csv import
-          // updates x scale for new data
+          // updates y scale for new data
           yLinearScale = yScale(dataDemo, chosenYAxis);
   
-          // updates x axis with transition
+          // updates y axis with transition
           yAxis = renderYAxes(yLinearScale, yAxis);
   
           // updates circles with new y values
