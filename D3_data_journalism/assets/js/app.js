@@ -133,7 +133,7 @@ function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
   }
 
   var toolTip = d3.tip()
-    .attr("class", "tooltip")
+    .attr("class", "d3-tip")
     .offset([80, -60])
     .html(function(d) {
       return (`${d.state}<br>${xlabel}: ${+d[chosenXAxis]}<br>${ylabel}: ${+d[chosenYAxis]}`);
@@ -224,7 +224,7 @@ d3.csv("assets/data/data.csv").then(function(dataDemo, err) {
       .call(leftAxis);
   
     // append initial circles
-    var circlesGroup = chartGroup.selectAll("circle")
+    var circlesGroup = chartGroup.selectAll("circle ")
       .data(dataDemo)
       .enter()
       .append("circle")
