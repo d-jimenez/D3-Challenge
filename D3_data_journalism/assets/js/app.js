@@ -1,8 +1,8 @@
 // @TODO: YOUR CODE HERE!
 
 // svg container
-var svgHeight = 400;
-var svgWidth = 1000;
+var svgHeight = 500;
+var svgWidth = 1200;
 
 // margins
 var margin = {
